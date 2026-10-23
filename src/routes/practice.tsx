@@ -26,7 +26,7 @@ export const Route = createFileRoute("/practice")({
   component: Practice,
 });
 
-interface Config { domain: DomainId | "all"; count: number; timed: boolean; mode: "learning" | "test"; topics?: string[] }
+interface Config { domain: DomainId | "all"; count: number; timed: boolean; mode: "learning" | "test"; topics?: string[] | undefined }
 
 function Practice() {
   const s = Route.useSearch();
@@ -105,7 +105,7 @@ function Quiz({ cfg, qs, onQuit }: { cfg: Config; qs: Question[]; onQuit: () => 
     saveAttempt({
       id, createdAt: new Date().toISOString(), domain: cfg.domain, mode: cfg.mode, timed: cfg.timed,
       durationSec: Math.round((Date.now() - start.current) / 1000),
-      responses: qs.map((q, k) => ({ questionId: q.id, selected: answers[k], correct: answers[k] === q.answer })),
+      responses: qs.map((q, k) => ({ questionId: q.id, selected: answers[k] ?? null, correct: answers[k] === q.answer })),
     });
     navigate({ to: "/results/$id", params: { id } });
   };
@@ -117,8 +117,8 @@ function Quiz({ cfg, qs, onQuit }: { cfg: Config; qs: Question[]; onQuit: () => 
   const answersRef = useRef(answers); answersRef.current = answers;
   useEffect(() => { if (cfg.timed && elapsed >= limit) submit(); }); // auto-submit when time runs out
 
-  const q = qs[i];
-  const sel = answers[i];
+  const q = qs[i]!;
+  const sel = answers[i] ?? null;
   const reveal = cfg.mode === "learning" && locked[i];
   const unanswered = answers.filter((a) => a === null).length;
   const remaining = Math.max(0, limit - elapsed);

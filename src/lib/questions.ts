@@ -239,7 +239,7 @@ export function pickQuestions(domain: DomainId | "all", count: number, topics?: 
   pool = [...pool];
   for (let i = pool.length - 1; i > 0; i--) {
     const j = Math.floor(rand() * (i + 1));
-    [pool[i], pool[j]] = [pool[j], pool[i]];
+    const t = pool[i]!; pool[i] = pool[j]!; pool[j] = t;
   }
   return pool.slice(0, count);
 }
